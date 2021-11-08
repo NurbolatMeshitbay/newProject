@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: ${COMPOSE_APP_NAME}-${COMPOSE_BRANCH}-nginx-${COMPOSE_APP_VERSION}
+    container_name: ${COMPOSE_APP_NAME}-${COMPOSE_BRANCH}-nginx-${COMPOSE_APP_VERSION}
+    restart: always
+    build:
+      context: ./
+      dockerfile: docker/nginx/Dockerfile
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8070:80"
+    links:
+      - php-fpm
+    working_dir: /var/www
+  php-fpm:
+    image: ${COMPOSE_APP_NAME}-${COMPOSE_BRANCH}-php-fpm:${COMPOSE_APP_VERSION}
+    container_name: ${COMPOSE_APP_NAME}-${COMPOSE_BRANCH}-php-fpm-${COMPOSE_APP_VERSION}
+    restart: always
+    build:
+      context: ./
+      dockerfile: docker/php_8/Dockerfile
+    volumes:
+      - ./:/var/www
+      - ./docker/php_8/config/php.ini:/usr/local/etc/php/php.ini
+    environment:
+      - PHP_IDE_CONFIG=serverName=localhost
+    working_dir: /var/www
